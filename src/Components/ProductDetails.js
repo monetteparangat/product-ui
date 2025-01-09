@@ -1,25 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Alert, Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 
-const ProductDetailsForm = () => {
+const ProductDetailsForm = ({ handlePage, productInfo }) => {
+    const [showAlert, setShowAlert] = useState(false);
+    const [productTypes, setProductTypes] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
     const [formData, setFormData] = useState({
-        name: '',
-        price: '',
-        type: '',
+        name: productInfo.name || "",
+        price: productInfo.price || "",
+        type: productInfo.type || ""
     });
 
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-
     useEffect(() => {
-        axios
-            .get('/products.json/1')
-            .then((response) => {
-                setProducts(response.data);
+        axios.get('http://localhost:8080/api/product/getTypes')
+            .then(response => {
+                setProductTypes(response.data);
                 setLoading(false);
+                console.log(response);
             })
-            .catch((error) => {
-                console.error('There was an error fetching the data!', error);
+            .catch(err => {
+                setError('Error fetching data!');
                 setLoading(false);
             });
     }, []);
@@ -32,59 +35,63 @@ const ProductDetailsForm = () => {
         });
     };
 
+    const handleBack = () => {
+        handlePage('products')
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(formData);
+        setShowAlert(true);
     };
 
     return (
-        <div className="container mt-5">
-            <h1>Product Details Form</h1>
-            <form onSubmit={handleSubmit} className="mt-4">
-                <div className="form-group">
-                    <label htmlFor="name">Product Name</label>
-                    <input
-                        id="name"
-                        name="name"
-                        type="text"
-                        className="form-control"
-                        value={formData.name}
-                        onChange={handleChange}
-                    />
-                </div>
+        <div>
+            <Container className="container mt-5">
+                {showAlert && (
+                    <Alert variant="success" className="mt-3" onClose={() => setShowAlert(false)} dismissible>
+                        Successfully Submitted
+                    </Alert>
+                )}
+                <h1>Product Details Form</h1>
+                <Row>
+                    <Col>
+                        <Form onSubmit={handleSubmit}>
+                            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                                <Form.Label className="text-start w-100">Product Name</Form.Label>
+                                <Form.Control type="text" name='name' value={formData.name} onChange={handleChange} />
+                            </Form.Group>
+                            <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                <Form.Label className="text-start w-100">Price</Form.Label>
+                                <Form.Control type="number" name='price' value={formData.price} onChange={handleChange} />
+                            </Form.Group>
+                            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                                <Form.Label className="text-start w-100">Product Name</Form.Label>
+                                <Form.Select aria-label="Default select example" name='type' value={formData.type} onChange={handleChange}>
+                                    <option>Select a type</option>
+                                    {productTypes.length > 0 ? (
+                                        productTypes.map((type, index) => (
+                                            <option key={index} value={type}>
+                                                {type}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option value="">Loading...</option>
+                                    )}
+                                </Form.Select>
+                            </Form.Group>
 
-                <div className="form-group">
-                    <label htmlFor="price">Price</label>
-                    <input
-                        id="price"
-                        name="price"
-                        type="number"
-                        className="form-control"
-                        value={formData.price}
-                        onChange={handleChange}
-                    />
-                </div>
+                            <Button className='m-5' variant="warning" onClick={handleBack}>
+                                Back
+                            </Button>
+                            <Button className='m-5' variant="primary" type="submit">
+                                Submit
+                            </Button>
 
-                <div className="form-group">
-                    <label htmlFor="type">Product Type</label>
-                    <select
-                        id="type"
-                        name="type"
-                        className="form-control"
-                        value={formData.type}
-                        onChange={handleChange}
-                    >
-                        <option value="">Select a type</option>
-                        <option value="Home Appliance">Home Appliance</option>
-                        <option value="Electronics">Electronics</option>
-                    </select>
-                </div>
-
-                <button type="submit" className="btn btn-primary">
-                    Submit
-                </button>
-            </form>
+                        </Form>
+                    </Col>
+                </Row>
+            </Container>
         </div>
     );
 };

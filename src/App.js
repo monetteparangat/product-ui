@@ -25,7 +25,7 @@ function App() {
               <AllProduct handlePage={handlePage} />
             }
             {page.toLowerCase() === 'edit-product' &&
-              <ProductDetailsForm productInfo={data} />
+              <ProductDetailsForm handlePage={handlePage} productInfo={data} />
             }
           </Col>
         </Row>
