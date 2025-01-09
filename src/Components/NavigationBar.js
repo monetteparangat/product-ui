@@ -11,11 +11,11 @@ function NavigationBar() {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        <Nav.Link href="#home">All Product</Nav.Link>
+                        {/* <Nav.Link href="#home">All Product</Nav.Link>
                         <Nav.Link href="#link">Product details</Nav.Link>
                         <Nav.Link href="#home">Product Type</Nav.Link>
                         <Nav.Link href="#link">Add Product</Nav.Link>
-                        <Nav.Link href="#link">Delete Product</Nav.Link>
+                        <Nav.Link href="#link">Delete Product</Nav.Link> */}
                     </Nav>
                 </Navbar.Collapse>
             </Container>
