@@ -1,30 +1,62 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Card, Col, Row, Table } from "react-bootstrap";
+import { Card, Col, Form, InputGroup, Row, Table } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
 
 function AllProduct({ handlePage }) {
     const [products, setProducts] = useState([]);
+    const [searchID, setSearchID] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        axios.get('http://localhost:8080/api/product')
-            .then(response => {
-                setProducts(response.data);
-                setLoading(false);
-                console.log(response);
-            })
-            .catch(err => {
-                setError('Error fetching data!');
-                setLoading(false);
-            });
-    }, []);
+        loadData();
+    }, [searchID]);
+
+
+
+    const loadData = () => {
+        if (searchID) {
+            axios.get(`http://localhost:8080/api/product/get/${searchID}`)
+                .then(response => {
+                    if (response.data) {
+                        const productsData = (Array.isArray(response.data)) ? response.data : [response.data];
+                        setProducts(productsData);
+                        setLoading(false);
+                        console.log(response, productsData.length);
+                    }else{
+                        setProducts([]);
+                    }
+                })
+                .catch(err => {
+                    setError('Error fetching data!');
+                    setLoading(false);
+                });
+        } else {
+            axios.get('http://localhost:8080/api/product')
+                .then(response => {
+                    setProducts(response.data);
+                    setLoading(false);
+                    console.log(response);
+                })
+                .catch(err => {
+                    setError('Error fetching data!');
+                    setLoading(false);
+                });
+
+        }
+    }
+
 
     const handleEdit = (selectedProduct) => {
         handlePage('edit-product', selectedProduct);
         console.log("test selected product", selectedProduct);
     }
+
+    const handleSearchOnChange = (e) => {
+        setSearchID(e.target.value)
+    }
+
 
     if (loading) {
         return <div>Loading...</div>;
@@ -38,9 +70,19 @@ function AllProduct({ handlePage }) {
         <div>
             <Row>
                 <Col>
-                    <Card className="p-5">
+                    <Row>
                         <h1>Product Lists</h1>
-                        {!loading && products.length > 0 && (
+                    </Row>
+                    <Row className="m-5">
+                        <InputGroup>
+                            <InputGroup.Text>
+                                <i className="bi bi-search"></i>
+                            </InputGroup.Text>
+                            <Form.Control type="number" placeholder="Search ID" value={searchID} onChange={handleSearchOnChange} />
+                        </InputGroup>
+                    </Row>
+                    <Card className="p-5">
+                        {!loading && products && products.length > 0 && (
                             <Table striped bordered hover>
                                 <thead>
                                     <tr>
