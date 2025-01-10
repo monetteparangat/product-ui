@@ -23,8 +23,8 @@ function AllProduct({ handlePage }) {
                         const productsData = (Array.isArray(response.data)) ? response.data : [response.data];
                         setProducts(productsData);
                         setLoading(false);
-                        console.log(response, productsData.length);
-                    }else{
+                        console.log(response);
+                    } else {
                         setProducts([]);
                     }
                 })
@@ -47,10 +47,13 @@ function AllProduct({ handlePage }) {
         }
     }
 
-
     const handleEdit = (selectedProduct) => {
-        handlePage('edit-product', selectedProduct);
+        handlePage('form-product', selectedProduct);
         console.log("test selected product", selectedProduct);
+    }
+
+    const handleAdd = () => {
+        handlePage('form-product');
     }
 
     const handleSearchOnChange = (e) => {
@@ -72,6 +75,11 @@ function AllProduct({ handlePage }) {
                 <Col>
                     <Row>
                         <h1>Product Lists</h1>
+                    </Row>
+                    <Row className="m-5 mb-0">
+                        <Button className="p-2" style={{ width: '80px' }} onClick={handleAdd}>
+                            <i className="bi bi-plus fs-2"></i>
+                        </Button>
                     </Row>
                     <Row className="m-5">
                         <InputGroup>
@@ -101,7 +109,7 @@ function AllProduct({ handlePage }) {
                                             <td>{product.price}</td>
                                             <td style={{ width: '100px' }}>
                                                 <Button variant="primary" onClick={() => handleEdit(product)}>
-                                                    <i className="bi bi-pencil-square"></i> Edit
+                                                    <i className="bi bi-pencil-square"></i> View
                                                 </Button>
                                             </td>
                                             <td style={{ width: '150px' }}>

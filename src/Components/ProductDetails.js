@@ -9,9 +9,10 @@ const ProductDetailsForm = ({ handlePage, productInfo }) => {
     const [error, setError] = useState(null);
 
     const [formData, setFormData] = useState({
-        name: productInfo.name || "",
-        price: productInfo.price || "",
-        type: productInfo.type || ""
+        id: productInfo?.id || "",
+        name: productInfo?.name || "",
+        price: productInfo?.price || "",
+        type: productInfo?.type || ""
     });
 
     useEffect(() => {
@@ -27,6 +28,20 @@ const ProductDetailsForm = ({ handlePage, productInfo }) => {
             });
     }, []);
 
+    const saveProduct = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.post('http://localhost:8080/api/product', formData);
+            setLoading(false);
+            setShowAlert(true);
+            setFormData({ name: '', price: '', type: '' });
+        } catch (error) {
+            console.error('Error adding product:', error);
+            setError('Failed to add product');
+            setLoading(false);
+        }
+    }
+
 
     const handleChange = (e) => {
         setFormData({
@@ -41,8 +56,8 @@ const ProductDetailsForm = ({ handlePage, productInfo }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        saveProduct()
         console.log(formData);
-        setShowAlert(true);
     };
 
     return (
@@ -53,21 +68,32 @@ const ProductDetailsForm = ({ handlePage, productInfo }) => {
                         Successfully Submitted
                     </Alert>
                 )}
+                 {error && (
+                    <Alert variant="warning" className="mt-3" onClose={() => setError(null)} dismissible>
+                        Product name must be unique
+                    </Alert>
+                )}
                 <h1>Product Details Form</h1>
                 <Row>
                     <Col>
                         <Form onSubmit={handleSubmit}>
+                            {formData.id &&
+                                <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                                    <Form.Label className="text-start w-100">Product ID</Form.Label>
+                                    <Form.Control type="text" name='name' value={formData.id} disabled />
+                                </Form.Group>
+                            }
                             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                                 <Form.Label className="text-start w-100">Product Name</Form.Label>
-                                <Form.Control type="text" name='name' value={formData.name} onChange={handleChange} />
+                                <Form.Control type="text" name='name' value={formData.name} onChange={handleChange} required />
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                                 <Form.Label className="text-start w-100">Price</Form.Label>
-                                <Form.Control type="number" name='price' value={formData.price} onChange={handleChange} />
+                                <Form.Control type="number" name='price' value={formData.price} onChange={handleChange} required />
                             </Form.Group>
                             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                                 <Form.Label className="text-start w-100">Product Name</Form.Label>
-                                <Form.Select aria-label="Default select example" name='type' value={formData.type} onChange={handleChange}>
+                                <Form.Select aria-label="Default select example" name='type' value={formData.type} onChange={handleChange} required>
                                     <option>Select a type</option>
                                     {productTypes.length > 0 ? (
                                         productTypes.map((type, index) => (
@@ -84,9 +110,11 @@ const ProductDetailsForm = ({ handlePage, productInfo }) => {
                             <Button className='m-5' variant="warning" onClick={handleBack}>
                                 Back
                             </Button>
-                            <Button className='m-5' variant="primary" type="submit">
-                                Submit
-                            </Button>
+                            {!formData.id &&
+                                <Button className='m-5' variant="primary" type="submit">
+                                    Submit
+                                </Button>
+                            }
 
                         </Form>
                     </Col>
